@@ -1,0 +1,12 @@
+<setup>
+    <block title="Okta Connection Setup" endpoint="okta_setup/okta_endpoint" entity="okta_endpoint">
+        <input field="endpoint">
+            <label>Please paste your Okta endpoint. Example: oktaworks.okta.com</label>
+            <type>text</type>
+        </input>
+        <input field="token">
+            <label>Please paste your API token </label>
+            <type>text</type>
+        </input>
+    </block>
+</setup>
