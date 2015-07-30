@@ -1,0 +1,259 @@
+<form>
+  <label>Application Access Analytics</label>
+  <fieldset submitButton="false">
+    <input type="time" token="field1" searchWhenChanged="true">
+      <label></label>
+      <default>
+        <earliest>-7d@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="multiselect" token="User" searchWhenChanged="true">
+      <search>
+        <query>eventtype=okta-events | rename actors{}.login AS Login |  stats count by Login | sort -count</query>
+        <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>Login</fieldForLabel>
+      <fieldForValue>Login</fieldForValue>
+      <choice value="*">All</choice>
+      <prefix>(</prefix>
+      <valuePrefix>actors{}.login="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <suffix>)</suffix>
+      <default>*</default>
+    </input>
+    <input type="multiselect" token="App" searchWhenChanged="true">
+      <label>Application</label>
+      <search>
+        <query>eventtype=okta-events  | stats count by AppInstance | sort -count</query>
+        <earliest>-30d@d</earliest>
+        <latest>now</latest>
+      </search>
+      <fieldForLabel>AppInstance</fieldForLabel>
+      <fieldForValue>AppInstance</fieldForValue>
+      <choice value="*">All</choice>
+      <prefix>(</prefix>
+      <valuePrefix>AppInstance="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <suffix>)</suffix>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <chart>
+        <title>Access by App</title>
+        <search>
+          <query>eventtype=okta-events $User$ $App$   "action.objectType"="app.auth.*" | timechart count by AppInstance usenull=f limit=5 useother=f</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Distinct Count Access by App</title>
+        <search>
+          <query>eventtype=okta-events $User$ $App$   "action.objectType"="app.auth.*"  | rename actors{}.login as login | timechart  limit=5 dc(login) as distinct by AppInstance usenull=f useother=f| rename distinct as "Distinct Count"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Access by Application</title>
+        <search>
+          <query>eventtype=okta-events $User$ $App$    "action.objectType"="app.auth.*" | chart count sparkline(count, 6h) as trend by AppInstance | sort -count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25px</option>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Distinct count by App</title>
+        <searchString>eventtype=okta-events $User$ $App$    "action.objectType"="app.auth.*"  | rename actors{}.login as login   | chart dc(login) as distinct sparkline(count, 6h) as trend by AppInstance | sort - distinct | rename distinct as "Distinct Count"</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25px</option>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Distinct Access by App</title>
+        <search>
+          <query>eventtype=okta-events $User$ $App$    "action.objectType"="app.auth.*"  | rename actors{}.login as login | stats dc(login) as distinct by AppInstance | sort - distinct | rename distinct as "Distinct Count"</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Application Access by User</title>
+        <searchString>eventtype=okta-events $User$ $App$    "action.objectType"="app.auth.*"  | rename actors{}.login as login | chart count sparkline(count, 6h) as trend by login | sort -count</searchString>
+        <earliestTime>$field1.earliest$</earliestTime>
+        <latestTime>$field1.latest$</latestTime>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25px</option>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Application Access by IP</title>
+        <search>
+          <query>eventtype=okta-events $User$ $App$    "action.objectType"="app.auth.*"  actors{}.ipAddress!=""  | rename actors{}.login as login | chart count sparkline(count, 6h) as trend by actors{}.ipAddress | sort -count</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">true</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+        <format type="sparkline" field="sparkline">
+          <option name="lineColor">#5379af</option>
+          <option name="fillColor">#CCDDFF</option>
+          <option name="lineWidth">1</option>
+          <option name="height">25px</option>
+        </format>
+      </table>
+    </panel>
+    <panel>
+      <chart>
+        <title>Most Popular Operating System</title>
+        <search>
+          <query>eventtype=okta-events  $User$ $App$   "action.objectType"="app.auth.*" | ua2os | stats count by operating_system | sort -count</query>
+          <earliest>-30d@d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="count">10</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">false</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+  </row>
+</form>

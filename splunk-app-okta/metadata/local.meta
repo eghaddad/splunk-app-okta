@@ -1,0 +1,59 @@
+[okta/okta_endpoint]
+version = 6.2.0
+modtime = 1435005065.827146000
+
+[app/install/is_configured]
+version = 6.2.0
+modtime = 1435005067.094037000
+
+[inputs/okta_object%3A%2F%2FEvents]
+version = 6.2.0
+modtime = 1434752183.390501000
+
+[app/credential%3Aoktaworks.okta.com%3Adummy%3A]
+owner = admin
+version = 6.2.0
+modtime = 1430430531.510548000
+
+[inputs/okta_object%3A%2F%2FApps]
+version = 6.2.0
+modtime = 1430446433.545059000
+
+[inputs/okta_object%3A%2F%2FGroups]
+version = 6.2.0
+modtime = 1430446434.402349000
+
+[inputs/okta_object%3A%2F%2FUsers]
+version = 6.2.0
+modtime = 1430446435.535960000
+
+[app/credential%3Aoktaprise.okta.com%3Adummy%3A]
+owner = admin
+version = 6.2.0
+modtime = 1434744373.816127000
+
+[app/credential%3Aacme2.okta.com%3Adummy%3A]
+owner = admin
+version = 6.2.0
+modtime = 1430501639.398749000
+
+[views/application_access_analytics]
+version = 6.2.0
+modtime = 1430759583.898505000
+
+[views/login_analytics]
+version = 6.2.0
+modtime = 1430760125.245337000
+
+[app/install/install_source_checksum]
+version = 6.2.0
+modtime = 1434744331.538614000
+
+[views/agent_activities]
+version = 6.2.0
+modtime = 1434750615.586435000
+
+[app/credential%3A1%3Adummy%3A]
+owner = admin
+version = 6.2.0
+modtime = 1435005065.809688000
